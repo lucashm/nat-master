@@ -7,8 +7,9 @@ server.on('error', (error) => {
 })
 
 server.on('message', (msg, info) => {
+  console.log(`Received ${msg.length} bytes.`)
   console.log(`InternalIP: ${msg.toString()}`)
-  console.log(`Received ${msg.length}. External IP: ${info.address}:${info.port}`)
+  console.log(`External IP: ${info.address}:${info.port}`)
   server.send(`take it back: ${msg}`, info.port, info.address,
     (err) => console.log('err:' + err))
 })
