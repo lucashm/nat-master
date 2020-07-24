@@ -1,0 +1,4 @@
+cmaker/node_modules
+cmaker/.env
+main/node_modules
+main/build
