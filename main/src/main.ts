@@ -1,4 +1,5 @@
 import { createSocket } from 'dgram'
+import { Buffer } from 'buffer'
 
 const server = createSocket('udp4')
 
@@ -11,13 +12,13 @@ server.on('error', (error) => {
 })
 
 server.on('message', (msg, info) => {
-  const strMsg = msg.toString()
+  const jsonMsg: {ip:string, port:number, msg:string} = JSON.parse(msg.toString())
   console.log(`Received ${msg.length} bytes.`)
-  console.log(`Message: ${strMsg}`)
+  console.log(`Message: ${jsonMsg.msg}`)
   console.log(`External IP: ${info.address}:${info.port}`)
 
-  switch (strMsg) {
-    case 'create_server':
+  switch (jsonMsg.msg) {
+    case 'create_server': {
       if (!serverList.some(i => i.ip === info.address)) {
         const { address, port } = info
         serverList.push({ ip: address, port })
@@ -28,12 +29,15 @@ server.on('message', (msg, info) => {
           info.port, info.address, errorHandler)
       }
       break
+    }
     case 'list_servers':
       server.send(JSON.stringify(serverList), info.port, info.address, errorHandler)
       break
-    case 'join_server':
-      // magic
+    case 'join_server': {
+      const data = Buffer.from(`${info.address}:${info.port}`)
+      server.send(data, jsonMsg.port, jsonMsg.ip, errorHandler)
       break
+    }
     default:
       server.send("Command doesn't compute", info.port, info.address, errorHandler)
   }
