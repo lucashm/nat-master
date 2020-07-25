@@ -5,6 +5,8 @@ const server = createSocket('udp4')
 
 const serverList:{ip:string, port: number}[] = []
 
+const errorHandler = (e: Error | null) => e && console.log('err:' + e)
+
 server.on('error', (error) => {
   console.log('Error: ' + error)
 })
@@ -15,13 +17,23 @@ server.on('message', (msg, info) => {
   console.log(`Message: ${strMsg}`)
   console.log(`External IP: ${info.address}:${info.port}`)
 
-  if (strMsg === 'create_server') {
-    if (!serverList.some(i => i.ip === info.address)) {
-      const { address, port } = info
-      serverList.push({ ip: address, port })
-      server.send(`Server created successfully for ${info.address}:${info.port}`,
-        info.port, info.address, (err) => err && console.log('err:' + err))
-    }
+  switch (strMsg) {
+    case 'create_server':
+      if (!serverList.some(i => i.ip === info.address)) {
+        const { address, port } = info
+        serverList.push({ ip: address, port })
+        server.send(`Server created successfully for ${info.address}:${info.port}`,
+          info.port, info.address, errorHandler)
+      }
+      break
+    case 'list_servers':
+      server.send(serverList, info.port, info.address, errorHandler)
+      break
+    case 'join_server':
+      // magic
+      break
+    default:
+      server.send("Command doesn't compute", info.port, info.address, errorHandler)
   }
 })
 
