@@ -13,6 +13,7 @@ server.on('error', (error) => {
 
 server.on('message', (msg, info) => {
   const jsonMsg: {ip:string, port:number, msg:string} = JSON.parse(msg.toString())
+  if (jsonMsg.msg === 'KA') return
   console.log(`Received ${msg.length} bytes.`)
   console.log(`Message: ${jsonMsg.msg}`)
   console.log(`External IP: ${info.address}:${info.port}`)
