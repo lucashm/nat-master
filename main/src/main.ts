@@ -23,6 +23,9 @@ server.on('message', (msg, info) => {
         serverList.push({ ip: address, port })
         server.send(`Server created successfully for ${info.address}:${info.port}`,
           info.port, info.address, errorHandler)
+      } else {
+        server.send(`Server already exists for ${info.address}:${info.port}`,
+          info.port, info.address, errorHandler)
       }
       break
     case 'list_servers':
