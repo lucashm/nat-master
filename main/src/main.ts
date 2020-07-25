@@ -37,9 +37,9 @@ server.on('message', (msg, info) => {
       server.send(JSON.stringify(serverList), info.port, info.address, errorHandler)
       break
     case 'join_server': {
-      const data = Buffer.from(`${info.address}:${info.port}`)
+      const data = { msg: 'connection_incoming', ip: info.address, port: info.port }
       console.log(`Sending data to ${jsonMsg.ip}:${jsonMsg.port}`)
-      server.send(data, jsonMsg.port, jsonMsg.ip, errorHandler)
+      server.send(JSON.stringify(data), jsonMsg.port, jsonMsg.ip, errorHandler)
       break
     }
     default:
