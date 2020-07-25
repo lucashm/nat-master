@@ -1,17 +1,28 @@
 import { createSocket } from 'dgram'
+import { stringify } from 'querystring'
 
 const server = createSocket('udp4')
+
+const serverList:{ip:string, port: number}[] = []
 
 server.on('error', (error) => {
   console.log('Error: ' + error)
 })
 
 server.on('message', (msg, info) => {
+  const strMsg = msg.toString()
   console.log(`Received ${msg.length} bytes.`)
-  console.log(`InternalIP: ${msg.toString()}`)
+  console.log(`Message: ${strMsg}`)
   console.log(`External IP: ${info.address}:${info.port}`)
-  server.send(`take it back: ${msg}`, info.port, info.address,
-    (err) => console.log('err:' + err))
+
+  if (strMsg === 'create_server') {
+    if (!serverList.some(i => i.ip === info.address)) {
+      const { address, port } = info
+      serverList.push({ ip: address, port })
+      server.send(`Server created successfully for ${info.address}:${info.port}`,
+        info.port, info.address, (err) => err && console.log('err:' + err))
+    }
+  }
 })
 
 server.on('listening', () => {
