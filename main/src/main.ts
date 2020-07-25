@@ -1,5 +1,4 @@
 import { createSocket } from 'dgram'
-import { stringify } from 'querystring'
 
 const server = createSocket('udp4')
 
@@ -27,7 +26,7 @@ server.on('message', (msg, info) => {
       }
       break
     case 'list_servers':
-      server.send(serverList, info.port, info.address, errorHandler)
+      server.send(JSON.stringify(serverList), info.port, info.address, errorHandler)
       break
     case 'join_server':
       // magic
