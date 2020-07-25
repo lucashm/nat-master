@@ -19,12 +19,14 @@ server.on('message', (msg, info) => {
 
   switch (jsonMsg.msg) {
     case 'create_server': {
-      if (!serverList.some(i => i.ip === info.address)) {
-        const { address, port } = info
+      const idx = serverList.findIndex(i => i.ip === info.address)
+      const { address, port } = info
+      if (idx === -1) {
         serverList.push({ ip: address, port })
         server.send(`Server created successfully for ${info.address}:${info.port}`,
           info.port, info.address, errorHandler)
       } else {
+        serverList[idx] = { ip: address, port }
         server.send(`Server already exists for ${info.address}:${info.port}`,
           info.port, info.address, errorHandler)
       }
